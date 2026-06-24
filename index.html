@@ -3,14 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Регистрация — Пассажирам.РФ(Гаврилов)</title>
+    <title>Пассажирам.РФ</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <header class="header">
       <h1>🚌 Пассажирам.РФ</h1>
+      <p style="font-size: 16px; opacity: 0.9; margin-top: 5px">
+        Обучение водителей пассажирского транспорта
+      </p>
       <nav>
         <a href="index.html">Главная</a>
+        <a href="register.html">Регистрация</a>
         <a href="login.html">Вход</a>
         <a href="profile.html">Профиль</a>
         <a href="application.html">Заявка</a>
@@ -18,174 +22,86 @@
       </nav>
     </header>
 
-    <div class="container grid-2">
-      <div class="form-wrapper">
-        <h2>📝 Регистрация</h2>
-        <p class="subtitle">
-          Создайте аккаунт для доступа ко всем возможностям
+    <div class="container">
+      <div class="info-block">
+        <h2>Добро пожаловать на портал!</h2>
+        <p>
+          Информационная система для записи на курсы обучения водителя
+          пассажирским перевозкам в городе. Автобус, электробус, трамвай —
+          выберите свой транспорт и начните обучение!
         </p>
-
-        <div id="errorMessage" class="error"></div>
-        <div id="successMessage" class="success"></div>
-
-        <form id="registerForm">
-          <div class="form-group">
-            <label for="login">Логин *</label>
-            <input
-              type="text"
-              id="login"
-              placeholder="Латинские буквы и цифры, минимум 6 символов"
-              required
-            />
-            <div class="hint">Только латиница и цифры, не менее 6 символов</div>
-          </div>
-
-          <div class="form-group">
-            <label for="password">Пароль *</label>
-            <input
-              type="password"
-              id="password"
-              placeholder="Минимум 8 символов"
-              required
-            />
-            <div class="hint">Не менее 8 символов</div>
-          </div>
-
-          <div class="form-group">
-            <label for="fullname">ФИО *</label>
-            <input
-              type="text"
-              id="fullname"
-              placeholder="Иванов Иван Иванович"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="birthdate">Дата рождения *</label>
-            <input type="date" id="birthdate" required />
-          </div>
-
-          <div class="form-group">
-            <label for="phone">Контактный телефон *</label>
-            <input
-              type="tel"
-              id="phone"
-              placeholder="+7 (999) 123-45-67"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="email">E-mail *</label>
-            <input
-              type="email"
-              id="email"
-              placeholder="example@mail.ru"
-              required
-            />
-          </div>
-
-          <button type="submit" class="btn btn-block">
-            Зарегистрироваться
-          </button>
-        </form>
-
-        <div class="form-link">
-          Уже есть аккаунт? <a href="login.html">Войти</a>
+        <div style="margin-top: 15px">
+          <span class="badge badge-blue"
+            >Новым пользователям — регистрация</span
+          >
+          <span class="badge badge-success" style="background: #28a745"
+            >Администраторам — вход</span
+          >
         </div>
       </div>
 
-      <div class="image-wrapper">
-        <!-- ЗАГЛУШКА ДЛЯ КАРТИНКИ: Иллюстрация регистрации -->
-        <div class="img-placeholder" style="height: 300px">
-          <p>🖼️ ЗАГЛУШКА ДЛЯ КАРТИНКИ</p>
-          <span>Иллюстрация регистрации пользователя</span>
-          <small>Рекомендуемый размер: 500×300px</small>
+      <div class="grid">
+        <div class="card">
+          <h3>📝 Регистрация</h3>
+          <p>Создайте аккаунт для доступа ко всем возможностям</p>
+          <a href="register.html" class="btn">Регистрация</a>
         </div>
+        <div class="card">
+          <h3>🔐 Вход</h3>
+          <p>Войдите в личный кабинет или как администратор</p>
+          <a href="login.html" class="btn">Войти</a>
+        </div>
+        <div class="card">
+          <h3>👤 Личный кабинет</h3>
+          <p>История заявок и ваши отзывы</p>
+          <a href="profile.html" class="btn">Перейти</a>
+        </div>
+        <div class="card">
+          <h3>📋 Новая заявка</h3>
+          <p>Оформите заявку на обучение</p>
+          <a href="application.html" class="btn">Оформить</a>
+        </div>
+        <div class="card" style="border-top-color: #dc3545">
+          <h3>⚙️ Админ-панель</h3>
+          <p>Управление заявками (только для администратора)</p>
+          <a href="admin.html" class="btn btn-danger">Вход в админку</a>
+        </div>
+      </div>
 
-        <!-- ЗАГЛУШКА ДЛЯ КАРТИНКИ: Дополнительное изображение -->
-        <div class="img-placeholder" style="height: 200px">
-          <p>🖼️ ЗАГЛУШКА ДЛЯ КАРТИНКИ</p>
-          <span>Преимущества обучения у нас</span>
-          <small>Рекомендуемый размер: 500×200px</small>
+      <img src="./assets/MG_6582.jpg" alt="" />
+
+      <div class="info-block" style="margin-top: 30px">
+        <h2>📌 Наше местонахождение</h2>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+          "
+        >
+          <div>
+            <p>
+              📍 <strong>Адрес:</strong> г. Москва, ул. Большая Ордынка, д. 15
+            </p>
+            <p>📞 <strong>Телефон:</strong> +7 (495) 123-45-67</p>
+            <p style="font-size: 12px; font-style: italic; color: #6c757d">
+              Если возникли вопросы или пожелания, позвоните нам. Ответим
+              оперативно и подробно.
+            </p>
+          </div>
+          <div>
+            <p><strong>💳 Варианты оплаты:</strong></p>
+            <ul style="list-style: none; padding: 0">
+              <li>• предоплата по QR-коду</li>
+              <li>• оплата картой МИР</li>
+              <li>• постоплата в офисе организации</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
 
     <footer class="footer">© 2026 Пассажирам.РФ — Все права защищены</footer>
-
-    <script>
-      document
-        .getElementById("registerForm")
-        .addEventListener("submit", function (e) {
-          e.preventDefault();
-
-          const login = document.getElementById("login").value.trim();
-          const password = document.getElementById("password").value.trim();
-          const fullname = document.getElementById("fullname").value.trim();
-          const birthdate = document.getElementById("birthdate").value;
-          const phone = document.getElementById("phone").value.trim();
-          const email = document.getElementById("email").value.trim();
-
-          const errorDiv = document.getElementById("errorMessage");
-          const successDiv = document.getElementById("successMessage");
-
-          errorDiv.style.display = "none";
-          successDiv.style.display = "none";
-
-          const loginRegex = /^[A-Za-z0-9]{6,}$/;
-          if (!loginRegex.test(login)) {
-            errorDiv.textContent =
-              "❌ Логин должен содержать только латинские буквы и цифры, минимум 6 символов!";
-            errorDiv.style.display = "block";
-            return;
-          }
-
-          if (password.length < 8) {
-            errorDiv.textContent =
-              "❌ Пароль должен содержать минимум 8 символов!";
-            errorDiv.style.display = "block";
-            return;
-          }
-
-          const users = JSON.parse(localStorage.getItem("users")) || [];
-          if (users.find((u) => u.login === login)) {
-            errorDiv.textContent =
-              "❌ Пользователь с таким логином уже существует!";
-            errorDiv.style.display = "block";
-            return;
-          }
-
-          if (!fullname || !birthdate || !phone || !email) {
-            errorDiv.textContent = "❌ Все поля обязательны для заполнения!";
-            errorDiv.style.display = "block";
-            return;
-          }
-
-          const newUser = {
-            login,
-            password,
-            fullname,
-            birthdate,
-            phone,
-            email,
-            registeredAt: new Date().toISOString(),
-          };
-
-          users.push(newUser);
-          localStorage.setItem("users", JSON.stringify(users));
-
-          document.getElementById("registerForm").reset();
-
-          successDiv.textContent =
-            "✅ Регистрация успешна! Теперь вы можете войти в систему.";
-          successDiv.style.display = "block";
-
-          setTimeout(() => {
-            window.location.href = "login.html";
-          }, 2000);
-        });
-    </script>
   </body>
 </html>

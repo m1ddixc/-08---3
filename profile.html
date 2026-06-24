@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <header class="header">
+      <h1>🚌 Пассажирам.РФ</h1>
+      <nav>
+        <a href="index.html">Главная</a>
+        <a href="register.html">Регистрация</a>
+        <a href="login.html">Вход</a>
+        <a href="application.html">Заявка</a>
+        <a href="admin.html">Админ</a>
+      </nav>
+    </header>
+
+    <div class="container">
+      <!-- Проверка авторизации -->
+      <div
+        id="notAuthorized"
+        class="error"
+        style="
+          display: none;
+          text-align: center;
+          padding: 20px;
+          font-size: 18px;
+        "
+      >
+        ⚠️ Вы не авторизованы! Пожалуйста,
+        <a href="login.html" style="color: #007bff; font-weight: 700"
+          >войдите</a
+        >
+        или
+        <a href="register.html" style="color: #007bff; font-weight: 700"
+          >зарегистрируйтесь</a
+        >.
+      </div>
+
+      <div id="profileContent" style="display: none">
+        <!-- Шапка профиля -->
+        <div class="profile-header">
+          <!-- ЗАГЛУШКА ДЛЯ КАРТИНКИ: Аватар пользователя -->
+          <div
+            class="img-placeholder profile-avatar"
+            style="
+              width: 150px;
+              height: 150px;
+              border-radius: 50%;
+              border: 4px solid #007bff;
+              flex-shrink: 0;
+            "
+          >
+            <p style="font-size: 14px">🖼️</p>
+            <span style="font-size: 12px">Аватар</span>
+            <small style="font-size: 10px">150×150px</small>
+          </div>
+
+          <div class="profile-info" id="userInfo">
+            <h2 id="userFullname">Иванов Иван Иванович</h2>
+            <p>📧 <span id="userEmail">ivan@mail.ru</span></p>
+            <p>📱 <span id="userPhone">+7 (999) 123-45-67</span></p>
+            <p>🎂 Дата рождения: <span id="userBirthdate">01.01.1990</span></p>
+            <p>
+              📅 Зарегистрирован: <span id="userRegistered">01.01.2026</span>
+            </p>
+            <span class="badge badge-success">✅ Активный пользователь</span>
+          </div>
+        </div>
+
+        <!-- Мои заявки -->
+        <h2 class="section-title">📋 Мои заявки на обучение</h2>
+        <div id="applicationsList">
+          <!-- Заявки будут подгружаться через JavaScript -->
+          <div class="empty-state">
+            <span class="big-icon">📝</span>
+            <p>У вас пока нет заявок</p>
+            <a href="application.html" class="btn" style="margin-top: 10px"
+              >Создать заявку</a
+            >
+          </div>
+        </div>
+
+        <!-- Отзывы -->
+        <h2 class="section-title">⭐ Мои отзывы</h2>
+
+        <!-- Форма отзыва -->
+        <div class="review-form">
+          <h3 style="color: #0d47a1; font-size: 18px; margin-bottom: 10px">
+            Оставить отзыв
+          </h3>
+          <form id="reviewForm">
+            <div class="form-group">
+              <label for="reviewText">Ваш отзыв о полученных услугах *</label>
+              <textarea
+                id="reviewText"
+                placeholder="Поделитесь впечатлениями о процессе обучения..."
+                required
+              ></textarea>
+            </div>
+            <button type="submit" class="btn">Отправить отзыв</button>
+          </form>
+          <div
+            id="reviewMessage"
+            class="success"
+            style="display: none; margin-top: 10px"
+          ></div>
+        </div>
+
+        <!-- Список отзывов -->
+        <div id="reviewsList" style="margin-top: 20px">
+          <div class="empty-state" id="noReviews">
+            <span class="big-icon">💬</span>
+            <p>Вы еще не оставляли отзывов</p>
+          </div>
+        </div>
+
+        <!-- Кнопка выхода -->
+        <div style="text-align: center; margin-top: 30px">
+          <button onclick="logout()" class="btn btn-danger">
+            🚪 Выйти из аккаунта
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">© 2026 Пассажирам.РФ — Все права защищены</footer>
+
+    <script>
+      // Проверка авторизации при загрузке страницы
+      window.onload = function () {
+        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+        if (!currentUser || currentUser.role === "admin") {
+          // Если пользователь не авторизован или это админ
+          document.getElementById("notAuthorized").style.display = "block";
+          document.getElementById("profileContent").style.display = "none";
+
+          // Если админ зашел, перенаправляем его в админку
+          if (currentUser && currentUser.role === "admin") {
+            window.location.href = "admin.html";
+          }
+          return;
+        }
+
+        // Показываем контент профиля
+        document.getElementById("notAuthorized").style.display = "none";
+        document.getElementById("profileContent").style.display = "block";
+
+        // Загружаем данные пользователя
+        const user = JSON.parse(localStorage.getItem("currentUser"));
+        document.getElementById("userFullname").textContent =
+          user.fullname || "Пользователь";
+        document.getElementById("userEmail").textContent =
+          user.email || "не указан";
+        document.getElementById("userPhone").textContent =
+          user.phone || "не указан";
+
+        if (user.birthdate) {
+          const date = new Date(user.birthdate);
+          document.getElementById("userBirthdate").textContent =
+            date.toLocaleDateString("ru-RU");
+        }
+
+        if (user.registeredAt) {
+          const date = new Date(user.registeredAt);
+          document.getElementById("userRegistered").textContent =
+            date.toLocaleDateString("ru-RU");
+        }
+
+        // Загружаем заявки пользователя
+        loadUserApplications(user.login);
+
+        // Загружаем отзывы пользователя
+        loadUserReviews(user.login);
+      };
+
+      // Функция загрузки заявок
+      function loadUserApplications(login) {
+        const allApplications =
+          JSON.parse(localStorage.getItem("applications")) || [];
+        const userApplications = allApplications.filter(
+          (app) => app.userLogin === login,
+        );
+
+        const container = document.getElementById("applicationsList");
+
+        if (userApplications.length === 0) {
+          container.innerHTML = `
+                    <div class="empty-state">
+                        <span class="big-icon">📝</span>
+                        <p>У вас пока нет заявок</p>
+                        <a href="application.html" class="btn" style="margin-top:10px;">Создать заявку</a>
+                    </div>
+                `;
+          return;
+        }
+
+        // Сортируем заявки по дате (сначала новые)
+        userApplications.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+        );
+
+        let html = "";
+        userApplications.forEach((app, index) => {
+          const createdDate = new Date(app.createdAt).toLocaleDateString(
+            "ru-RU",
+          );
+          let statusBadge = "";
+          if (app.status === "Новая") {
+            statusBadge = '<span class="badge badge-blue">🟦 Новая</span>';
+          } else if (app.status === "Идет обучение") {
+            statusBadge =
+              '<span class="badge badge-orange">🟡 Идет обучение</span>';
+          } else if (app.status === "Обучение завершено") {
+            statusBadge =
+              '<span class="badge badge-success">✅ Обучение завершено</span>';
+          }
+
+          html += `
+                    <div class="application-item">
+                        <div class="app-info">
+                            <strong>${app.transport}</strong>
+                            <div class="app-date">📅 ${app.startDate} | 💳 ${app.paymentMethod}</div>
+                            <div class="app-date" style="font-size:12px;">Создана: ${createdDate}</div>
+                        </div>
+                        ${statusBadge}
+                    </div>
+                `;
+        });
+
+        container.innerHTML = html;
+      }
+
+      // Функция загрузки отзывов
+      function loadUserReviews(login) {
+        const allReviews = JSON.parse(localStorage.getItem("reviews")) || [];
+        const userReviews = allReviews.filter(
+          (review) => review.userLogin === login,
+        );
+
+        const container = document.getElementById("reviewsList");
+
+        if (userReviews.length === 0) {
+          document.getElementById("noReviews").style.display = "block";
+          return;
+        }
+
+        document.getElementById("noReviews").style.display = "none";
+
+        let html = "";
+        userReviews.forEach((review) => {
+          const date = new Date(review.createdAt).toLocaleDateString("ru-RU");
+          html += `
+                    <div class="review-item">
+                        <div class="review-date">📅 ${date}</div>
+                        <div class="review-text">${review.text}</div>
+                    </div>
+                `;
+        });
+
+        container.innerHTML = html;
+      }
+
+      // Отправка отзыва
+      document
+        .getElementById("reviewForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+          if (!currentUser) {
+            alert("Пожалуйста, войдите в систему");
+            return;
+          }
+
+          const reviewText = document.getElementById("reviewText").value.trim();
+          if (!reviewText) {
+            alert("Пожалуйста, введите текст отзыва");
+            return;
+          }
+
+          const reviews = JSON.parse(localStorage.getItem("reviews")) || [];
+
+          const newReview = {
+            userLogin: currentUser.login,
+            userFullname: currentUser.fullname,
+            text: reviewText,
+            createdAt: new Date().toISOString(),
+          };
+
+          reviews.push(newReview);
+          localStorage.setItem("reviews", JSON.stringify(reviews));
+
+          // Очищаем форму
+          document.getElementById("reviewForm").reset();
+
+          // Показываем сообщение об успехе
+          const msgDiv = document.getElementById("reviewMessage");
+          msgDiv.textContent = "✅ Отзыв успешно добавлен!";
+          msgDiv.style.display = "block";
+
+          setTimeout(() => {
+            msgDiv.style.display = "none";
+          }, 3000);
+
+          // Перезагружаем список отзывов
+          loadUserReviews(currentUser.login);
+        });
+
+      // Функция выхода
+      function logout() {
+        if (confirm("Вы уверены, что хотите выйти?")) {
+          localStorage.removeItem("currentUser");
+          localStorage.removeItem("currentAdmin");
+          window.location.href = "login.html";
+        }
+      }
+    </script>
+  </body>
+</html>

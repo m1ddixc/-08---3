@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Вход</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="header">
+      <h1>🚌 Пассажирам.РФ</h1>
+      <nav>
+        <a href="index.html">Главная</a>
+        <a href="register.html">Регистрация</a>
+        <a href="profile.html">Профиль</a>
+        <a href="application.html">Заявка</a>
+        <a href="admin.html">Админ</a>
+      </nav>
+    </header>
+
+    <div class="container grid-2-center">
+      <!-- Левая колонка: Форма входа -->
+      <div class="form-wrapper login-container">
+        <h2>🔐 Вход в систему</h2>
+        <p class="subtitle">Войдите в личный кабинет или как администратор</p>
+
+        <!-- Подсказка для администратора -->
+        <div class="admin-hint">
+          🔑 <strong>Для администратора:</strong> Логин:
+          <strong>Admin26</strong> | Пароль: <strong>Demo20</strong>
+        </div>
+
+        <div id="errorMessage" class="error"></div>
+        <div id="successMessage" class="success"></div>
+
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="login">Логин *</label>
+            <input
+              type="text"
+              id="login"
+              placeholder="Введите ваш логин"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Пароль *</label>
+            <input
+              type="password"
+              id="password"
+              placeholder="Введите ваш пароль"
+              required
+            />
+          </div>
+
+          <button type="submit" class="btn btn-block">Войти</button>
+        </form>
+
+        <div class="form-link">
+          Еще не зарегистрированы? <a href="register.html">Регистрация</a>
+        </div>
+      </div>
+
+      <img class="imgscnd" src="./assets/e295464686cc17d074cb2f14.jpg" alt="">
+    </div>
+
+    <footer class="footer">© 2026 Пассажирам.РФ — Все права защищены</footer>
+
+    <script>
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const login = document.getElementById("login").value.trim();
+          const password = document.getElementById("password").value.trim();
+
+          const errorDiv = document.getElementById("errorMessage");
+          const successDiv = document.getElementById("successMessage");
+
+          errorDiv.style.display = "none";
+          successDiv.style.display = "none";
+
+          // Проверка на пустые поля
+          if (!login || !password) {
+            errorDiv.textContent = "❌ Пожалуйста, заполните все поля!";
+            errorDiv.style.display = "block";
+            return;
+          }
+
+          // Проверка на администратора
+          if (login === "Admin26" && password === "Demo20") {
+            successDiv.textContent =
+              "✅ Добро пожаловать, Администратор! Перенаправление в панель управления...";
+            successDiv.style.display = "block";
+
+            // Сохраняем сессию админа
+            localStorage.setItem("currentAdmin", "true");
+            localStorage.setItem(
+              "currentUser",
+              JSON.stringify({ login: "Admin26", role: "admin" }),
+            );
+
+            setTimeout(() => {
+              window.location.href = "admin.html";
+            }, 1500);
+            return;
+          }
+
+          // Проверка на обычного пользователя
+          const users = JSON.parse(localStorage.getItem("users")) || [];
+          const user = users.find(
+            (u) => u.login === login && u.password === password,
+          );
+
+          if (user) {
+            successDiv.textContent =
+              "✅ Вход выполнен успешно! Перенаправление в личный кабинет...";
+            successDiv.style.display = "block";
+
+            // Сохраняем сессию пользователя
+            localStorage.setItem("currentUser", JSON.stringify(user));
+            localStorage.setItem("currentAdmin", "false");
+
+            setTimeout(() => {
+              window.location.href = "profile.html";
+            }, 1500);
+          } else {
+            // Проверяем, существует ли логин
+            const userExists = users.find((u) => u.login === login);
+            if (!userExists) {
+              errorDiv.textContent =
+                "❌ Пользователь с таким логином не найден! Проверьте правильность ввода или зарегистрируйтесь.";
+            } else {
+              errorDiv.textContent = "❌ Неверный пароль! Попробуйте еще раз.";
+            }
+            errorDiv.style.display = "block";
+          }
+        });
+
+      // Автоматическая очистка сообщений при вводе
+      document.getElementById("login").addEventListener("input", function () {
+        document.getElementById("errorMessage").style.display = "none";
+        document.getElementById("successMessage").style.display = "none";
+      });
+      document
+        .getElementById("password")
+        .addEventListener("input", function () {
+          document.getElementById("errorMessage").style.display = "none";
+          document.getElementById("successMessage").style.display = "none";
+        });
+    </script>
+  </body>
+</html>

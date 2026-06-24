@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Админ-панель</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="header">
+      <h1>🚌 Пассажирам.РФ</h1>
+      <nav>
+        <a href="index.html">Главная</a>
+        <a href="register.html">Регистрация</a>
+        <a href="login.html">Вход</a>
+        <a href="profile.html">Профиль</a>
+        <a href="application.html">Заявка</a>
+      </nav>
+    </header>
+
+    <div class="container">
+      <!-- Проверка авторизации админа -->
+      <div
+        id="notAuthorized"
+        class="error"
+        style="
+          display: none;
+          text-align: center;
+          padding: 20px;
+          font-size: 18px;
+        "
+      >
+        ⚠️ Доступ запрещен! Только для администратора.
+        <a href="login.html" style="color: #007bff; font-weight: 700"
+          >Войти как администратор</a
+        >
+      </div>
+
+      <div id="adminContent" style="display: none">
+        <!-- Шапка админа -->
+        <div class="admin-header">
+          <div class="admin-info">
+            <!-- ЗАГЛУШКА ДЛЯ КАРТИНКИ: Аватар администратора -->
+            <div
+              class="img-placeholder admin-avatar"
+              style="
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                border: 3px solid #dc3545;
+                flex-shrink: 0;
+              "
+            >
+              <p style="font-size: 12px">🖼️</p>
+              <span style="font-size: 8px">Admin</span>
+            </div>
+            <div>
+              <h2>👋 Здравствуйте, Администратор!</h2>
+              <p>Управление заявками на обучение</p>
+            </div>
+          </div>
+          <div>
+            <button onclick="logoutAdmin()" class="btn btn-danger">
+              🚪 Выйти
+            </button>
+          </div>
+        </div>
+
+        <!-- Статистика -->
+        <div class="admin-stats" id="statsContainer">
+          <div class="stat-card">
+            <span class="stat-icon">📋</span>
+            <div class="stat-number" id="totalApps">0</div>
+            <div class="stat-label">Всего заявок</div>
+          </div>
+          <div class="stat-card" style="border-top: 4px solid #007bff">
+            <span class="stat-icon">🆕</span>
+            <div class="stat-number" id="newApps" style="color: #007bff">0</div>
+            <div class="stat-label">Новые</div>
+          </div>
+          <div class="stat-card" style="border-top: 4px solid #28a745">
+            <span class="stat-icon">✅</span>
+            <div class="stat-number" id="completedApps" style="color: #28a745">
+              0
+            </div>
+            <div class="stat-label">Завершено</div>
+          </div>
+        </div>
+
+        <!-- Таблица заявок -->
+        <h3 style="font-size: 20px; color: #0d47a1; margin-bottom: 15px">
+          📋 Все заявки
+        </h3>
+        <div class="admin-table-container">
+          <div id="applicationsTable">
+            <div class="no-applications">
+              <span class="big-icon">📭</span>
+              <p>Заявок пока нет</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">© 2026 Пассажирам.РФ — Все права защищены</footer>
+
+    <script>
+      // Проверка авторизации админа при загрузке страницы
+      window.onload = function () {
+        const currentAdmin = localStorage.getItem("currentAdmin");
+        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+        if (
+          !currentAdmin ||
+          currentAdmin !== "true" ||
+          !currentUser ||
+          currentUser.role !== "admin"
+        ) {
+          document.getElementById("notAuthorized").style.display = "block";
+          document.getElementById("adminContent").style.display = "none";
+          return;
+        }
+
+        document.getElementById("notAuthorized").style.display = "none";
+        document.getElementById("adminContent").style.display = "block";
+
+        // Загружаем заявки
+        loadAllApplications();
+      };
+
+      // Функция загрузки всех заявок
+      function loadAllApplications() {
+        const applications =
+          JSON.parse(localStorage.getItem("applications")) || [];
+
+        // Обновляем статистику
+        const total = applications.length;
+        const newApps = applications.filter(
+          (app) => app.status === "Новая",
+        ).length;
+        const completedApps = applications.filter(
+          (app) => app.status === "Обучение завершено",
+        ).length;
+
+        document.getElementById("totalApps").textContent = total;
+        document.getElementById("newApps").textContent = newApps;
+        document.getElementById("completedApps").textContent = completedApps;
+
+        // Генерируем таблицу
+        const container = document.getElementById("applicationsTable");
+
+        if (applications.length === 0) {
+          container.innerHTML = `
+                    <div class="no-applications">
+                        <span class="big-icon">📭</span>
+                        <p>Заявок пока нет</p>
+                    </div>
+                `;
+          return;
+        }
+
+        // Сортируем по дате (сначала новые)
+        applications.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+        );
+
+        let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>Пользователь</th>
+                            <th>Транспорт</th>
+                            <th>Дата начала</th>
+                            <th>Оплата</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+        applications.forEach((app, index) => {
+          const createdDate = new Date(app.createdAt).toLocaleDateString(
+            "ru-RU",
+          );
+
+          let statusClass = "";
+          let statusText = "";
+          if (app.status === "Новая") {
+            statusClass = "status-new";
+            statusText = "🆕 Новая";
+          } else if (app.status === "Идет обучение") {
+            statusClass = "status-training";
+            statusText = "🟡 Идет обучение";
+          } else if (app.status === "Обучение завершено") {
+            statusClass = "status-completed";
+            statusText = "✅ Обучение завершено";
+          }
+
+          // Кнопки действий (только если статус не "Обучение завершено")
+          let actionsHtml = "";
+          if (app.status === "Новая") {
+            actionsHtml = `
+                        <button class="btn-small btn-status-training" onclick="changeStatus(${app.id}, 'Идет обучение')">🔄 В обучение</button>
+                        <button class="btn-small btn-status-completed" onclick="changeStatus(${app.id}, 'Обучение завершено')">✅ Завершить</button>
+                    `;
+          } else if (app.status === "Идет обучение") {
+            actionsHtml = `
+                        <button class="btn-small btn-status-completed" onclick="changeStatus(${app.id}, 'Обучение завершено')">✅ Завершить</button>
+                        <button class="btn-small btn-status-new" onclick="changeStatus(${app.id}, 'Новая')">↩️ Вернуть в новые</button>
+                    `;
+          } else {
+            actionsHtml = `
+                        <button class="btn-small btn-status-training" onclick="changeStatus(${app.id}, 'Идет обучение')">🔄 Вернуть в обучение</button>
+                    `;
+          }
+
+          html += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td><strong>${app.userFullname || app.userLogin}</strong><br><span style="font-size:12px; color:#6c757d;">${app.userLogin}</span></td>
+                        <td>${app.transport}</td>
+                        <td>${app.startDate}</td>
+                        <td style="font-size:12px;">${app.paymentMethod}</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>
+                            <div class="admin-actions">
+                                ${actionsHtml}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+        });
+
+        html += `
+                    </tbody>
+                </table>
+            `;
+
+        container.innerHTML = html;
+      }
+
+      // Функция изменения статуса заявки
+      function changeStatus(applicationId, newStatus) {
+        const applications =
+          JSON.parse(localStorage.getItem("applications")) || [];
+        const appIndex = applications.findIndex(
+          (app) => app.id === applicationId,
+        );
+
+        if (appIndex === -1) {
+          alert("Заявка не найдена!");
+          return;
+        }
+
+        // Проверяем, есть ли смысл менять статус
+        if (applications[appIndex].status === newStatus) {
+          alert("Заявка уже имеет этот статус!");
+          return;
+        }
+
+        // Подтверждение
+        const statusLabels = {
+          Новая: "🆕 Новую",
+          "Идет обучение": '🟡 "Идет обучение"',
+          "Обучение завершено": '✅ "Обучение завершено"',
+        };
+
+        if (
+          !confirm(
+            `Изменить статус заявки #${appIndex + 1} на "${statusLabels[newStatus] || newStatus}"?`,
+          )
+        ) {
+          return;
+        }
+
+        // Меняем статус
+        applications[appIndex].status = newStatus;
+        localStorage.setItem("applications", JSON.stringify(applications));
+
+        // Перезагружаем таблицу
+        loadAllApplications();
+
+        // Показываем уведомление
+        showNotification(`✅ Статус заявки изменен на "${newStatus}"`);
+      }
+
+      // Функция уведомления
+      function showNotification(message) {
+        const existing = document.querySelector(".admin-notification");
+        if (existing) existing.remove();
+
+        const notification = document.createElement("div");
+        notification.className = "success";
+        notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #d4edda;
+                color: #155724;
+                padding: 15px 25px;
+                border-radius: 8px;
+                font-size: 16px;
+                z-index: 1000;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                max-width: 400px;
+                animation: slideIn 0.3s ease;
+            `;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+          notification.style.opacity = "0";
+          notification.style.transition = "opacity 0.3s";
+          setTimeout(() => notification.remove(), 300);
+        }, 3000);
+      }
+
+      // Функция выхода из админки
+      function logoutAdmin() {
+        if (confirm("Вы уверены, что хотите выйти?")) {
+          localStorage.removeItem("currentAdmin");
+          localStorage.removeItem("currentUser");
+          window.location.href = "login.html";
+        }
+      }
+
+      // Добавляем анимацию для уведомления
+      const style = document.createElement("style");
+      style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+      document.head.appendChild(style);
+    </script>
+  </body>
+</html>
